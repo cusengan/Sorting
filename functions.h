@@ -14,11 +14,20 @@ const char* getField(char* line, int num){
 	strcpy(copy, line);
 	int count = 0;
 	for(token = strtok(copy, ","); token && *token; token = strtok(NULL, ",")){
-		if(count == num) return token;
+		if(count == num){
+			free(copy);
+			return token;
+		}
 		count++;
 	}
 	free(copy);
 	return NULL;
+}
+
+void swap(char** string1, char** string2){
+	char* temp = *string1;
+	*string1 = *string2;
+	*string2 = temp;
 }
 
 void insertionSort(char** array, int size){
@@ -30,8 +39,9 @@ void insertionSort(char** array, int size){
 		char* temp = (char*)malloc(STRING_LENGTH*sizeof(char));
 		strcpy(temp, array[i]);
 		while(j >= 0 && atof(getField(array[j],1)) > key){
-		// 	strcpy(array[j+1], array[j]);
-		// 	j--;
+			// strcpy(array[j+1], array[j]);
+			swap(&array[j+1], &array[j]);
+			j--;
 		}
 
 		strcpy(array[j+1], temp);
@@ -90,9 +100,9 @@ void oneProcessSort(){
 	int count = countLines(stream);
 	char** array = allocateArray(stream, count);
 	insertionSort(array, count);
-	// for(int i = 0; i < count ;i++){
-	// 	printf("%s\n", array[i]);
-	// }
+	for(int i = 0; i < count ;i++){
+		printf("%s\n", array[i]);
+	}
 
 	
 	freeArray(array, count);
@@ -101,6 +111,27 @@ void oneProcessSort(){
 	time = clock() - time;
 	printf("Sorting with one process ran in %f seconds\n", (double)time/CLOCKS_PER_SEC);
 
+}
+
+void twoProcessSort(){
+	clock_t time = clock();
+
+	FILE* stream = fopen("all_month.csv", "r");
+	pid_t child1;
+	pid_t child2;
+	
+	int count = countLines(stream);
+	char cmd[100];
+	char buffer[20];
+	strcpy(cmd, "split all_month.csv -l ");
+	sprintf(buffer, "%d", (count/2) + 1);
+	strcat(cmd, buffer);
+	system(cmd);
+
+
+
+
+	fclose(stream);
 }
 
 
