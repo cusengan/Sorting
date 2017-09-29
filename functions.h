@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include <time.h>
 #define STRING_LENGTH 1024
 
@@ -115,11 +116,11 @@ void oneProcessSort(){
 
 void twoProcessSort(){
 	clock_t time = clock();
-
+	int processCount = 2;
 	FILE* stream = fopen("all_month.csv", "r");
-	pid_t child1;
+	pid_t child;
 	pid_t child2;
-	
+
 	int count = countLines(stream);
 	char cmd[100];
 	char buffer[20];
@@ -127,10 +128,28 @@ void twoProcessSort(){
 	sprintf(buffer, "%d", (count/2) + 1);
 	strcat(cmd, buffer);
 	system(cmd);
+	FILE* xaa = fopen("xaa", "r");
+	FILE* xab = fopen("xab", "r");
+	int size1 = countLines(xaa);
+	int size2 = countLines(xab);
 
+	char** array1 = allocateArray();
 
+	for(int id = 0; id < processCount; id++){
+		child = fork();
+		if(child== 0){//in child{
+			printf("child %d\n", id);
+			fd
+			
 
+			exit(0);
+		}else{
+			wait(NULL);
+		}
+	}
 
+	fclose(xaa);
+	fclose(xab);
 	fclose(stream);
 }
 
