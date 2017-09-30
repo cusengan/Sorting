@@ -232,7 +232,7 @@ void twoProcessSort(){
 	fclose(xaa);
 	fclose(xab);
 	fclose(file1);
-	//system("rm xaa; rm xab; rm file1");
+	system("rm xaa; rm xab; rm file1");
 	fclose(stream);
 	time = clock() - time;
 	printf("Sorting with two processes ran in %f seconds\n", (double)time/CLOCKS_PER_SEC);
