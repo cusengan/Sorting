@@ -3,7 +3,7 @@
 int main(){
 
 	//oneProcessSort();
-	//twoProcessSort();
+	// twoProcessSort();
 	fourProcessSort();
 
 }

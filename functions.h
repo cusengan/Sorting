@@ -118,7 +118,7 @@ void merge(char** array, FILE* file1, FILE* file2, int size1, int size2){
 		double key2 = atof(getField(array2[j], 1));
 		if(key1 <= key2){
 			strcpy(array[index++], array1[i++]);
-		}else strcpy(array[index++], array[j++]);
+		}else strcpy(array[index++], array2[j++]);
 	}
 
 	while(i < size1){
@@ -133,6 +133,12 @@ void merge(char** array, FILE* file1, FILE* file2, int size1, int size2){
 	freeArray(array2, size2);
 	free(array1);
 	free(array2);
+}
+
+void printArray(char** array, int size){
+	for(int i = 0; i < size; i++){
+		printf("%s\n", array[i] );
+	}
 }
 
 void splitFile(int count, int partitions){
@@ -176,9 +182,15 @@ void twoProcessSort(){
 		exit(1);
 	}
 	pid_t child;
+	pid_t child2;
 
 	int count = countLines(stream, 1);
-	splitFile(count,processCount);
+	char cmd[100];
+	char buffer[20];
+	strcpy(cmd, "split all_month.csv -l ");
+	sprintf(buffer, "%d", (count/2) + 1);
+	strcat(cmd, buffer);
+	system(cmd);
 	FILE* xaa = fopen("xaa", "r+");
 	FILE* xab = fopen("xab", "r+");
 	if(xaa == NULL || xab == NULL){
@@ -226,9 +238,7 @@ void twoProcessSort(){
 		exit(1);
 	}
 	merge(array, file1, xab, size1, size2);
-	for(int i = 0; i < count; i++){
-		printf("%s", array[i] );
-	}
+	printArray(array, count);
 	freeArray(array,count);
 	free(array);
 	fclose(xaa);
@@ -237,7 +247,7 @@ void twoProcessSort(){
 	system("rm xaa; rm xab; rm file1");
 	fclose(stream);
 	time = clock() - time;
-	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
+	printf("Sorting with two processes ran in %f seconds\n", (double)time/CLOCKS_PER_SEC);
 }
 
 void fourProcessSort(){
@@ -265,6 +275,7 @@ void fourProcessSort(){
 	int size2 = countLines(xab, 0);
 	int size3 = countLines(xac, 0);
 	int size4 = countLines(xad, 0);
+	// printf("%d-%d-%d-%d\n", size1, size2, size3, size4);
 	for(int id = 0; id < processCount; id++){
 		child = fork();
 		if(child== 0){//in child{
@@ -282,7 +293,6 @@ void fourProcessSort(){
 				fclose(file1);
 			}
 
-			
 			if(id == 1){
 				char** array2 = allocateArray(xab, size2, 0);
 				insertionSort(array2, size2);
@@ -291,32 +301,105 @@ void fourProcessSort(){
 				free(array2);				
 			}
 			if(id == 2){
-				char** array2 = allocateArray(xab, size2, 0);
-				insertionSort(array2, size2);
-				writeToFile(xab, array2, size2);
-				freeArray(array2, size2);
-				free(array2);				
+				char** array3 = allocateArray(xac, size3, 0);
+				insertionSort(array3, size3);
+				writeToFile(xac, array3, size3);
+				freeArray(array3, size3);
+				free(array3);				
 			}
 			if(id == 3){
-				char** array2 = allocateArray(xab, size2, 0);
-				insertionSort(array2, size2);
-				writeToFile(xab, array2, size2);
-				freeArray(array2, size2);
-				free(array2);				
+				char** array4 = allocateArray(xad, size4, 0);
+				insertionSort(array4, size4);
+				writeToFile(xad, array4, size4);
+				freeArray(array4, size4);
+				free(array4);				
 			}
 			exit(0);
 			
+		}else if(child < 0){
+			perror("fork failed\n");
+			exit(1);
+		}else{
+			wait(NULL);
+		}
+
+	}//end for loop
+
+	char** arrayMerge = allocateArrayNoFile(size1 + size2);
+				FILE* file1 = fopen("file1", "r+");
+				if(file1 == NULL){
+					perror("Failed to open file");
+					exit(1);
+				}
+				FILE* merge3 = fopen("merge1", "w+");
+				if(merge3 == NULL){
+					perror("Failed to open file");
+					exit(1);
+				}
+				merge(arrayMerge, file1, xab, size1, size2);
+				// printArray(arrayMerge, size1+size2);
+				writeToFile(merge3, arrayMerge, size1+size2);
+				freeArray(arrayMerge, size1+size2);
+				free(arrayMerge);
+				fclose(file1);
+				fclose(merge3);
+
+	for(int id = 0; id < processCount/2; id++){//use two processes to merge files in pairs
+		child = fork();
+		if(child== 0){//in child{
+			if(id == 0){
+				char** arrayMerge = allocateArrayNoFile(size1 + size2);
+				FILE* file1 = fopen("file1", "r+");
+				if(file1 == NULL){
+					perror("Failed to open file");
+					exit(1);
+				}
+				FILE* merge1 = fopen("merge1", "w+");
+				if(merge1 == NULL){
+					perror("Failed to open file");
+					exit(1);
+				}
+				merge(arrayMerge, file1, xab, size1, size2);
+				// printArray(arrayMerge, size1+size2);
+				writeToFile(merge1, arrayMerge, size1+size2);
+				freeArray(arrayMerge, size1+size2);
+				free(arrayMerge);
+				fclose(file1);
+				fclose(merge1);
+			}
+
+			if(id == 1){
+				char** arrayMerge = allocateArrayNoFile(size3 + size4);
+				merge(arrayMerge, xac, xad, size3, size4);
+				FILE* merge2 = fopen("merge2", "w+");
+				if(merge2 == NULL){
+					perror("Failed to open file");
+					exit(1);
+				}
+				writeToFile(merge2, arrayMerge, size3 + size4);
+				freeArray(arrayMerge, size3+size4);
+				free(arrayMerge);
+				fclose(merge2);					
+			
+			}
+
+			exit(0);
+		}
+		else if(child < 0){
+			perror("fork failed\n");
+			exit(1);
 		}else{
 			wait(NULL);
 		}
 	}
 
-
 	fclose(xaa);
 	fclose(xab);
 	fclose(xac);
 	fclose(xad);
+	//fclose(file1);
 	fclose(stream);
+	//system("rm xaa xab xac xad file1");
 	time = clock() - time;
 	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
 }
