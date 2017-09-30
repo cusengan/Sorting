@@ -2,8 +2,8 @@
 
 int main(){
 
-	//oneProcessSort();
-	// twoProcessSort();
+	// oneProcessSort();
+	twoProcessSort();
 	fourProcessSort();
 
 }

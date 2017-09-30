@@ -152,6 +152,7 @@ void splitFile(int count, int partitions){
 
 void oneProcessSort(){
 	clock_t time = clock();
+	int processCount = 1;
 	FILE* stream = fopen("all_month.csv", "r");
 	if(stream == NULL){
 		perror("Failed to open file");
@@ -160,16 +161,12 @@ void oneProcessSort(){
 	int count = countLines(stream, 1);
 	char** array = allocateArray(stream, count, 1);
 	insertionSort(array, count);
-	for(int i = 0; i < count ;i++){
-		printf("%s", array[i]);
-	}
-
-	
+	// printArray(array, count);	
 	freeArray(array, count);
 	free(array);
 	fclose(stream);
 	time = clock() - time;
-	printf("Sorting with one process ran in %f seconds\n", (double)time/CLOCKS_PER_SEC);
+	printf("Sorting with %d process ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
 
 }
 
@@ -228,17 +225,25 @@ void twoProcessSort(){
 			}
 			exit(0);
 			
+		}else if(child < 0){
+			perror("fork failed\n");
+			exit(1);
 		}else{
-			wait(NULL);
+			continue;
 		}
 	}
+	if(child > 0){//wait for both child processes to finish
+		wait(NULL);
+		wait(NULL);
+	}
+
 	FILE* file1 = fopen("file1", "r+");
 	if(file1 == NULL){
 		perror("Failed to open file");
 		exit(1);
 	}
 	merge(array, file1, xab, size1, size2);
-	printArray(array, count);
+	// printArray(array, count);
 	freeArray(array,count);
 	free(array);
 	fclose(xaa);
@@ -247,7 +252,7 @@ void twoProcessSort(){
 	system("rm xaa; rm xab; rm file1");
 	fclose(stream);
 	time = clock() - time;
-	printf("Sorting with two processes ran in %f seconds\n", (double)time/CLOCKS_PER_SEC);
+	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
 }
 
 void fourProcessSort(){
@@ -275,7 +280,7 @@ void fourProcessSort(){
 	int size2 = countLines(xab, 0);
 	int size3 = countLines(xac, 0);
 	int size4 = countLines(xad, 0);
-	// printf("%d-%d-%d-%d\n", size1, size2, size3, size4);
+	char** array = allocateArrayNoFile(count);
 	for(int id = 0; id < processCount; id++){
 		child = fork();
 		if(child== 0){//in child{
@@ -320,29 +325,17 @@ void fourProcessSort(){
 			perror("fork failed\n");
 			exit(1);
 		}else{
-			wait(NULL);
+			continue;
 		}
 
 	}//end for loop
 
-	char** arrayMerge = allocateArrayNoFile(size1 + size2);
-				FILE* file1 = fopen("file1", "r+");
-				if(file1 == NULL){
-					perror("Failed to open file");
-					exit(1);
-				}
-				FILE* merge3 = fopen("merge1", "w+");
-				if(merge3 == NULL){
-					perror("Failed to open file");
-					exit(1);
-				}
-				merge(arrayMerge, file1, xab, size1, size2);
-				// printArray(arrayMerge, size1+size2);
-				writeToFile(merge3, arrayMerge, size1+size2);
-				freeArray(arrayMerge, size1+size2);
-				free(arrayMerge);
-				fclose(file1);
-				fclose(merge3);
+	if(child > 0){ //wait for 4 processes to finish
+		wait(NULL);
+		wait(NULL);
+		wait(NULL);
+		wait(NULL);
+	}
 
 	for(int id = 0; id < processCount/2; id++){//use two processes to merge files in pairs
 		child = fork();
@@ -389,19 +382,39 @@ void fourProcessSort(){
 			perror("fork failed\n");
 			exit(1);
 		}else{
-			wait(NULL);
+			continue;
 		}
 	}
 
+	if(child > 0){
+		wait(NULL);
+		wait(NULL);
+	}
+
+	FILE* merge1 = fopen("merge1", "r+");
+	FILE* merge2 = fopen("merge2", "r+");
+	if(merge1 == NULL || merge2 == NULL){
+		perror("Failed to open file");
+		exit(1);
+	}
+
+	merge(array, merge1, merge2, size1+size2, size3+size4);
+	// printArray(array, count);
+	time = clock() - time;
+	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
 	fclose(xaa);
 	fclose(xab);
 	fclose(xac);
 	fclose(xad);
-	//fclose(file1);
 	fclose(stream);
-	//system("rm xaa xab xac xad file1");
-	time = clock() - time;
-	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
+	freeArray(array, count);
+	free(array);
+	system("rm xaa xab xac xad file1 merge1 merge2");
+	
+}
+
+void tenProcessSort(){
+
 }
 
 
