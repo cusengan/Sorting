@@ -3,9 +3,10 @@
 int main(){
 
 	// oneProcessSort();
-	twoProcessSort();
+	// twoProcessSort();
+	tenProcessSort();
 	fourProcessSort();
-
+	
 }
 
 

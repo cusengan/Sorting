@@ -150,6 +150,9 @@ void splitFile(int count, int partitions){
 	system(cmd);
 }
 
+void printTime(int processCount, clock_t time){
+	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
+}
 
 
 
