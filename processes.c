@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "sorting.h"
 
 int main(){
 
