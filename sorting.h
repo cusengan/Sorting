@@ -64,10 +64,7 @@ void twoProcessSort(){
 			argv[0] = "./sorting";
 			argv[1] = fileNames[id];
 			argv[2] = NULL;
-
-			execvp(argv[0], argv);
-
-			
+			execvp(argv[0], argv);			
 			exit(0);
 			
 		}else if(child < 0){
@@ -148,10 +145,7 @@ void fourProcessSort(){
 			argv[0] = "./sorting";
 			argv[1] = fileNames[id];
 			argv[2] = NULL;
-
-			execvp(argv[0], argv);
-
-			
+			execvp(argv[0], argv);		
 			exit(0);
 			
 		}else if(child < 0){
@@ -179,9 +173,7 @@ void fourProcessSort(){
 			argv[2] = fileNames[id*2+1];
 			argv[3] = mergeFileNames[id];
 			argv[4] = NULL;
-
 			execvp(argv[0], argv);
-
 			exit(0);
 		}
 		else if(child < 0){
@@ -278,12 +270,7 @@ void tenProcessSort(){
 			argv[0] = "./sorting";
 			argv[1] = fileNames[id];
 			argv[2] = NULL;
-
-			execvp(argv[0], argv);
-
-			
-			exit(0);
-
+			execvp(argv[0], argv);			
 			exit(0);
 			
 		}else if(child < 0){
@@ -317,9 +304,7 @@ void tenProcessSort(){
 			argv[2] = fileNames[id*2+1];
 			argv[3] = mergeFileNames[id];
 			argv[4] = NULL;
-
 			execvp(argv[0], argv);
-
 			exit(0);
 		}
 		else if(child < 0){
@@ -343,16 +328,13 @@ void tenProcessSort(){
 	for(int id = 0; id < 2; id++){//use 2 processes to merge merge1/merge2 and merge3/merge4
 		child = fork();
 		if(child== 0){//in child{
-			
 			char* argv[5];
 			argv[0] = "./merge";
 			argv[1] = mergeFileNames[id*2];
 			argv[2] = mergeFileNames[id*2+1];
 			argv[3] = mergeLargeFileNames[id];
 			argv[4] = NULL;
-
 			execvp(argv[0], argv);
-
 			exit(0);
 		}
 		else if(child < 0){

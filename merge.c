@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]){
 	
-	printf("%s-%s-%s\n", argv[1], argv[2], argv[3] );
+	// printf("%s-%s-%s\n", argv[1], argv[2], argv[3] );
 	FILE* file1 = fopen(argv[1], "r+");
 	FILE* file2 = fopen(argv[2], "r+");
 	FILE* mergeFile = fopen(argv[3], "w+");
