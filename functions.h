@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <time.h>
+#include <pthread.h>
 #define STRING_LENGTH 1024
 
 const char* getField(char* line, int num){
@@ -151,7 +152,11 @@ void splitFile(int count, int partitions){
 }
 
 void printTime(int processCount, clock_t time){
-	printf("Sorting with %d processes ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
+	printf("Sorting with %d process(es) ran in %f seconds\n", processCount, (double)time/CLOCKS_PER_SEC);
+}
+
+void printTimeThreads(int threadCount, clock_t time){
+	printf("Sorting with %d thread(s) ran in %f seconds\n", threadCount, (double)time/CLOCKS_PER_SEC);
 }
 
 

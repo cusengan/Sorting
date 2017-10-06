@@ -1,11 +1,14 @@
 #include "sorting.h"
+#include "threads.h"
 
 int main(){
 
-	oneProcessSort();
+	// oneProcessSort();
 	twoProcessSort();
-	fourProcessSort();
-	tenProcessSort();
+	// fourProcessSort();
+	// tenProcessSort();
+	// oneThreadSort();
+	twoThreadSort();
 }
 
 
