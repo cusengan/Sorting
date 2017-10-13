@@ -3,15 +3,20 @@
 #include <pthread.h>
 
 struct data{
-	char* argv[4];
+	char* argv;
 	int id;
 };
 
 void* thread(void* vargp){
 	struct data* stuff = (struct data*)vargp;
 	
-	printf("%d-%s\n", stuff->id, stuff->argv[stuff->id]);
+	printf("%d-%s\n", stuff->id, stuff->argv);
 	free(vargp);
+}
+
+void* thread2(void* vargp){
+	printf("%d", (*(int*)vargp));
+	// free(vargp);
 }
 
 
@@ -19,18 +24,18 @@ int main(){
 
 	pthread_t tid[3];
 	struct data* stuff;
-	// stuff.argv[0] = "hi";
-	// stuff.argv[1] = "hello";
-	// stuff.argv[2] = "bruh";
+	char* fileNames[4] = {"file1", "xab", "xac", "xad"};
+	char* mergeFileNames[2] = {"merge1", "merge2"};
 
+	// for(int i = 0; i < 3; i++){
+	// 	stuff = (struct data*)malloc(sizeof(struct data));
+	// 	stuff->argv = fileNames[i];	
+	// 	(*stuff).id = i;
+	// 	pthread_create(&tid[i], NULL, thread, (void*)stuff);
+	// }
 
-	for(int i = 0; i < 3; i++){
-		stuff = (struct data*)malloc(sizeof(struct data));
-		stuff->argv[0] = "hi";
-		stuff->argv[1] = "hello";
-		stuff->argv[2] = "bruh";	
-		(*stuff).id = i;
-		pthread_create(&tid[i], NULL, thread, (void*)stuff);
+	for(int i = 0; i < 3; i++){ // test
+		pthread_create(&tid[i], NULL, thread2, (void*)&i);
 	}
 
 	for(int i = 0; i < 3; i++){

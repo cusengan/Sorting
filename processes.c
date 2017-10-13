@@ -3,12 +3,17 @@
 
 int main(){
 
-	// oneProcessSort();
+	oneProcessSort();
+	oneThreadSort();
+
 	twoProcessSort();
-	// fourProcessSort();
-	// tenProcessSort();
-	// oneThreadSort();
 	twoThreadSort();
+
+	fourProcessSort();
+	fourThreadSort();
+
+	tenProcessSort();
+	tenThreadSort();
 }
 
 

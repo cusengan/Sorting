@@ -7,3 +7,6 @@ twoProcessSorted
 fourProcessSorted
 tenProcessSorted
 oneThreadSorted
+twoThreadSorted
+fourThreadSorted
+tenThreadSorted
